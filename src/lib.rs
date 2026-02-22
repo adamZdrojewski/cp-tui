@@ -1,13 +1,24 @@
+mod components;
+pub mod events;
+
 use std::{io, sync::mpsc};
 
 use crossterm::event::{KeyCode, KeyEventKind};
-use ratatui::{buffer::Buffer, layout::{Constraint, Layout, Rect}, style::Stylize, widgets::{Block, Borders, List, Paragraph, Widget}, DefaultTerminal, Frame};
+use ratatui::{buffer::Buffer, layout::{Constraint, Layout, Rect}, widgets::Widget, DefaultTerminal, Frame};
+
+use crate::{components::{header::Header, wait_time_list::WaitTimeList}, events::Event};
 
 pub struct App {
     pub exit: bool
 }
 
 impl App {
+    pub fn new() -> Self {
+        Self {
+            exit: false
+        }
+    }
+
     pub fn run(&mut self, terminal: &mut DefaultTerminal, rx: mpsc::Receiver<Event>) -> io::Result<()> {
         // Main loop
         while !self.exit {
@@ -31,14 +42,6 @@ impl App {
 
         Ok(())
     }
-
-    fn render_title(area: Rect, buf: &mut Buffer) {
-        Paragraph::new("Cedar Point")
-            .bold()
-            .block(Block::default()
-                .borders(Borders::ALL))
-            .render(area, buf);
-    }
 }
 
 impl Widget for &App {
@@ -50,23 +53,7 @@ impl Widget for &App {
         ]);
         let [left_side, right_side] = horizontal_layout.areas(area);
 
-        App::render_title(left_side, buf);
-
-        List::new(["one", "two", "three"])
-            .block(Block::bordered().title("My List"))
-            .render(right_side, buf);
-    }
-}
-
-pub enum Event {
-    Input(crossterm::event::KeyEvent)
-}
-
-pub fn handle_input_events(tx: mpsc::Sender<Event>) {
-    loop {
-        match crossterm::event::read().unwrap() {
-            crossterm::event::Event::Key(key_event) => tx.send(Event::Input(key_event)).unwrap(),
-            _ => {}
-        }
+        Header.render(left_side, buf);
+        WaitTimeList.render(right_side, buf);
     }
 }
