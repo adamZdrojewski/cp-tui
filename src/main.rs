@@ -2,7 +2,8 @@ use std::{io, sync::mpsc, thread};
 
 use cp_tui::{events::{handle_input_events, Event}, App};
 
-fn main() -> io::Result<()> {
+#[tokio::main]
+async fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
 
     let mut app = App::new();
