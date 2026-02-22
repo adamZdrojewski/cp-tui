@@ -5,9 +5,7 @@ use cp_tui::{events::{handle_input_events, Event}, App};
 fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
 
-    let mut app = App {
-        exit: false
-    };
+    let mut app = App::new();
 
     let (event_tx, event_rx) = mpsc::channel::<Event>();
 
