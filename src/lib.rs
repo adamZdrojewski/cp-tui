@@ -1,7 +1,7 @@
 use std::{io, sync::mpsc};
 
 use crossterm::event::{KeyCode, KeyEventKind};
-use ratatui::{style::Stylize, text::Line, widgets::Widget, DefaultTerminal, Frame};
+use ratatui::{buffer::Buffer, layout::{Constraint, Layout, Rect}, style::Stylize, widgets::{Block, Borders, List, Paragraph, Widget}, DefaultTerminal, Frame};
 
 pub struct App {
     pub exit: bool
@@ -31,12 +31,30 @@ impl App {
 
         Ok(())
     }
+
+    fn render_title(area: Rect, buf: &mut Buffer) {
+        Paragraph::new("Cedar Point")
+            .bold()
+            .block(Block::default()
+                .borders(Borders::ALL))
+            .render(area, buf);
+    }
 }
 
 impl Widget for &App {
-    fn render(self, area: ratatui::prelude::Rect, buf: &mut ratatui::prelude::Buffer) where
+    fn render(self, area: Rect, buf: &mut Buffer) where
         Self: Sized {
-        Line::from("Hello World!").bold().render(area, buf);
+        let horizontal_layout = Layout::horizontal([
+            Constraint::Percentage(50),
+            Constraint::Percentage(50)
+        ]);
+        let [left_side, right_side] = horizontal_layout.areas(area);
+
+        App::render_title(left_side, buf);
+
+        List::new(["one", "two", "three"])
+            .block(Block::bordered().title("My List"))
+            .render(right_side, buf);
     }
 }
 
