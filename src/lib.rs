@@ -1,5 +1,6 @@
 mod components;
 pub mod events;
+pub mod wait_times;
 
 use std::{io, sync::mpsc};
 
